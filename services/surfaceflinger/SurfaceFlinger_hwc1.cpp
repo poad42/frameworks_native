@@ -30,6 +30,7 @@
 
 #include <EGL/egl.h>
 
+#include <cutils/iosched_policy.h>
 #include <cutils/log.h>
 #include <cutils/properties.h>
 
@@ -64,6 +65,10 @@
 #include <private/gui/SyncFeatures.h>
 
 #include "./DisplayUtils.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4999616b3795fffb38473ec23faa318543e66433
 #include <set>
 
 #include "Client.h"
@@ -493,6 +498,14 @@ void SurfaceFlinger::init() {
            ALOGE("Couldn't set SCHED_FIFO for SFEventThread");
        }
     }
+    // set SFEventThread to SCHED_FIFO to minimize jitter
+    if (mSFEventThread != NULL) {
+        struct sched_param param = {0};
+        param.sched_priority = 2;
+        if (sched_setscheduler(mSFEventThread->getTid(), SCHED_FIFO, &param) != 0) {
+            ALOGE("Couldn't set SCHED_FIFO for SFEventThread");
+        }
+    }
 
     // Initialize the H/W composer object.  There may or may not be an
     // actual hardware composer underneath.
@@ -555,6 +568,7 @@ void SurfaceFlinger::init() {
 
     mEventControlThread = new EventControlThread(this);
     mEventControlThread->run("EventControl", PRIORITY_URGENT_DISPLAY);
+    android_set_rt_ioprio(mEventControlThread->getTid(), 1);
 
     // set a fake vsync period if there is no HWComposer
     if (mHwc->initCheck() != NO_ERROR) {

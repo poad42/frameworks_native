@@ -91,7 +91,9 @@ class SurfaceFlinger : public BnSurfaceComposer,
                        private HWComposer::EventHandler
 {
 public:
+#ifdef QTI_BSP
     friend class ExSurfaceFlinger;
+#endif
 
     static char const* getServiceName() ANDROID_API {
         return "SurfaceFlinger";
@@ -264,6 +266,11 @@ private:
                      bool& /*bIgnoreLayers*/,
                      int& /*indexLOI*/) { }
 
+#ifndef USE_HWC2
+    virtual bool updateLayerVisibleNonTransparentRegion(
+                     const int& dpy, const sp<Layer>& layer,
+                     bool& bIgnoreLayers, int& indexLOI,
+                     uint32_t layerStack, const int& i);
     virtual void delayDPTransactionIfNeeded(
                      const Vector<DisplayState>& /*displays*/) { }
 
@@ -288,10 +295,19 @@ private:
                      bool& bIgnoreLayers, int& indexLOI,
                      uint32_t layerStack, const int& i);
 
+<<<<<<< HEAD
     virtual void  drawWormHoleIfRequired(HWComposer::LayerListIterator &cur,
                      const HWComposer::LayerListIterator &end,
                      const sp<const DisplayDevice>& hw,
                      const Region& region);
+=======
+    virtual void updateVisibleRegionsDirty() { }
+
+    virtual void  drawWormHoleIfRequired(HWComposer::LayerListIterator &cur,
+        const HWComposer::LayerListIterator &end,
+        const sp<const DisplayDevice>& hw,
+        const Region& region);
+>>>>>>> 4999616b3795fffb38473ec23faa318543e66433
 #endif
     virtual bool isS3DLayerPresent(const sp<const DisplayDevice>& /*hw*/)
         { return false; };
